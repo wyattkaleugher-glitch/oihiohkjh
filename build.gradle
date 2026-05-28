@@ -13,6 +13,8 @@ repositories {
 dependencies {
     // Target changed to 1.21.11
     compileOnly 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
 }
 
 // Minecraft 1.20.5+ and 1.21+ require Java 21 to compile and run!
@@ -31,6 +33,12 @@ tasks.withType(JavaCompile).configureEach {
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
         options.release.set(targetJavaVersion)
     }
+}
+
+// Tests are not used in this project; disable the test task so `build` doesn't
+//   fail trying to load the JUnit Platform launcher.
+tasks.named('test') {
+    enabled = false
 }
 
 processResources {

@@ -94,7 +94,7 @@ public class TechniqueCommands implements CommandExecutor {
                     return true;
                 }
                 DomainEngine.launchDomain(player, profile, plugin.getConfig());
-                
+
                 // Set Domain cooldown
                 int cd = plugin.getConfig().getInt("domain.cooldown", 180);
                 profile.setCooldown("domain", cd);
