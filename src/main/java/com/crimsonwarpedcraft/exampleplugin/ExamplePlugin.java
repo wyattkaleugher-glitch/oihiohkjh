@@ -15,17 +15,20 @@ public class ExamplePlugin extends JavaPlugin {
         
         saveDefaultConfig();
 
+        // Register the class as both the Command Executor AND the Tab Completer
         if (getCommand("jjk") != null) {
-            getCommand("jjk").setExecutor(new TechniqueCommands(this));
+            TechniqueCommands handler = new TechniqueCommands(this);
+            getCommand("jjk").setExecutor(handler);
+            getCommand("jjk").setTabCompleter(handler);
         }
 
         getServer().getPluginManager().registerEvents(new CombatListener(this), this);
-        getLogger().info("JJK Plugin Core fully initialized!");
+        getLogger().info("JJK Plugin Core fully initialized with custom Tab-Completion suggestions!");
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("JJK Plugin Core shutting down smoothly.");
+        getLogger().info("JJK Plugin Core safely suspended.");
     }
 
     public ProfileManager getProfileManager() {
