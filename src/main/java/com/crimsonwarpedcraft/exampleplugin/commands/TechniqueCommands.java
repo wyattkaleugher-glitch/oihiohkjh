@@ -93,7 +93,7 @@ public class TechniqueCommands implements CommandExecutor {
                     player.sendMessage("§cYou lack the required Cursed Energy!");
                     return true;
                 }
-                DomainEngine.launchDomain(player, profile, plugin.getConfig());
+                DomainEngine.launchDomain(player, profile());
 
                 // Set Domain cooldown
                 int cd = plugin.getConfig().getInt("domain.cooldown", 180);
