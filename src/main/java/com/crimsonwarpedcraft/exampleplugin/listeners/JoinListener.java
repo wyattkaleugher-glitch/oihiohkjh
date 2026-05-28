@@ -25,9 +25,11 @@ public class JoinListener implements Listener {
     public void onFirstJoinAssignment(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         
+        // Only triggers if the player has never connected to this server before
         if (!player.hasPlayedBefore()) {
             PlayerProfile profile = plugin.getProfileManager().getProfile(player.getUniqueId());
             
+            // Randomly select an Innate Technique (Excluding NONE)
             TechniqueType[] templates = TechniqueType.values();
             TechniqueType selectedType = TechniqueType.NONE;
             
@@ -35,21 +37,29 @@ public class JoinListener implements Listener {
                 selectedType = templates[random.nextInt(templates.length)];
             }
             
+            // Apply the "First Join" starter package
             profile.setTechnique(selectedType);
+            profile.setGrade("Grade 4");
             profile.setMaxCursedEnergy(1000);
             profile.setCursedEnergy(1000);
-            profile.setGrade("Grade 4"); // Sets starting default tier
             
+            // CRITICAL: Force the ProfileManager to write this to the .yml file immediately
+            // This ensures the technique stays even if the server crashes or restarts
             plugin.getProfileManager().saveProfile(player.getUniqueId());
 
+            // Awakening Message
             player.sendMessage("§b§m---------------------------------------------");
             player.sendMessage("§e§l   SOUL AWAKENING DETECTED!");
             player.sendMessage("§7 You have been born with the Innate Technique: §d§l" + selectedType.name());
+            player.sendMessage("§7 Your current rank: §fGrade 4");
             player.sendMessage("§b§m---------------------------------------------");
         }
     }
 
-    // 🔒 GUARD RAIL: Saves data to the disk storage file whenever a player logs off
+    /**
+     * Ensures all player data (CE, Grade, Technique) is saved to the disk
+     * the moment a player leaves the server.
+     */
     @EventHandler
     public void onPlayerLeaveSave(PlayerQuitEvent event) {
         plugin.getProfileManager().unloadProfile(event.getPlayer().getUniqueId());
