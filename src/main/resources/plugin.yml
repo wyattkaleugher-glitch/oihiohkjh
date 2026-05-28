@@ -3,7 +3,7 @@ version: 1.0.0
 main: me.username.jjkplugin.JJKPlugin
 api-version: '1.21'
 description: Command-driven Jujutsu Kaisen combat core built natively for Paper 1.21.11.
-authors: Packet
+authors: 'CrimsonWarpedCraft'
 
 commands:
   jjk:
