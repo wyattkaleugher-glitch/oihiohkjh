@@ -1,21 +1,23 @@
 name: JJKPlugin
 version: 1.0.0
-main: me.username.jjkplugin.JJKPlugin
-api-version: '1.21'
-description: Command-driven Jujutsu Kaisen combat core built natively for Paper 1.21.11.
-authors: 'CrimsonWarpedCraft'
+main: com.crimsonwarpedcraft.exampleplugin.ExamplePlugin
+api-version: '1.20'
+authors:
+  - CrimsonWarpedCraft
+description: A complete Jujutsu Kaisen combat technique system with dynamic metadata shard drops.
 
 commands:
   jjk:
-    description: Master command for executing Cursed Techniques.
-    usage: /jjk <ability1|ability2|domain|shadowinv>
-    aliases: [cast, attack]
-  jjkadmin:
-    description: Admin commands to manage grades and techniques.
-    permission: jjk.admin
-    usage: /jjkadmin <setgrade|setce|givescroll> <player> [value]
+    description: Master command suite for jujutsu innate styles.
+    usage: /jjk <ability1|ability2|domain|setclass|reload|givece|setmaxce>
 
+# =====================================================================
+# ADMINISTRATIVE AND PLAYER PERMISSION SECTIONS
+# =====================================================================
 permissions:
+  jjk.use:
+    description: Allows basic access to cast abilities and pick character classes.
+    default: true
   jjk.admin:
-    description: Master admin access.
-    default: op 
+    description: Administrative override section. Allows reloading configurations, giving CE, and setting max limits.
+    default: op
