@@ -9,11 +9,8 @@ description: A complete Jujutsu Kaisen combat technique system with dynamic meta
 commands:
   jjk:
     description: Master command suite for jujutsu innate styles.
-    usage: /jjk <ability1|ability2|domain|setclass|reload|givece|setmaxce>
+    usage: /jjk <ability1|ability2|domain|setclass|reload|givece|setmaxce|giveitem>
 
-# =====================================================================
-# ADMINISTRATIVE AND PLAYER PERMISSION SECTIONS
-# =====================================================================
 permissions:
   jjk.use:
     description: Allows basic access to cast abilities and pick character classes.
