@@ -18,4 +18,4 @@ commands:
 permissions:
   jjk.admin:
     description: Master admin access.
-    default: op
+    default: op 
