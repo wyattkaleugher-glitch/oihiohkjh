@@ -26,15 +26,30 @@ public class PlayerProfile {
 
     // 🏆 GRADE ADVANCEMENT FLOW
     public void promoteToNextGrade() {
-        // Defines the exact step-by-step ladder progression
+        String oldGrade = this.jujutsuGrade;
+        
         switch (this.jujutsuGrade) {
-            case "Grade 4" -> this.jujutsuGrade = "Grade 3";
-            case "Grade 3" -> this.jujutsuGrade = "Grade 2";
-            case "Grade 2" -> this.jujutsuGrade = "Grade 1";
-            case "Grade 1" -> this.jujutsuGrade = "Special Grade";
-            default -> {
-                // If they are already Special Grade or have a custom title, do not overwrite it
+            case "Grade 4" -> {
+                this.jujutsuGrade = "Grade 3";
+                this.maxCursedEnergy += 500; // +500 CE for reaching Grade 3
             }
+            case "Grade 3" -> {
+                this.jujutsuGrade = "Grade 2";
+                this.maxCursedEnergy += 1000; // +1000 CE for reaching Grade 2
+            }
+            case "Grade 2" -> {
+                this.jujutsuGrade = "Grade 1";
+                this.maxCursedEnergy += 1500; // +1500 CE for reaching Grade 1
+            }
+            case "Grade 1" -> {
+                this.jujutsuGrade = "Special Grade";
+                this.maxCursedEnergy += 2000; // +2000 CE for Special Grade
+            }
+        }
+        
+        // Refill CE on rank up as a reward
+        if (!oldGrade.equals(this.jujutsuGrade)) {
+            this.cursedEnergy = this.maxCursedEnergy;
         }
     }
 
