@@ -1,1 +1,128 @@
-# A journey of 1,000 lines starts with a single char
+# ====================================================================
+#              JUJUTSU KAISEN COMPREHENSIVE CONFIGURATION
+#                        Target: Paper 1.21.11
+# ====================================================================
+
+# Master Resource settings mapping out Grade Capacity limits
+cursed-energy:
+  grades:
+    grade_4:
+      max-ce: 250
+      display-name: "§fGrade 4 Sorcerer"
+    grade_3:
+      max-ce: 500
+      display-name: "§aGrade 3 Sorcerer"
+    grade_2:
+      max-ce: 1000
+      display-name: "§bGrade 2 Sorcerer"
+    grade_1:
+      max-ce: 3000
+      display-name: "§eGrade 1 Sorcerer"
+    special_grade:
+      max-ce: 5000
+      display-name: "§cSpecial Grade Sorcerer"
+  
+  hud:
+    # Action bar color configuration
+    bar-color: "AQUA"
+    display-format: "§b|||||||||| %current% / %max% CE"
+
+# Global settings for Domain Expansions
+domains:
+  universal:
+    activation-cost: 500
+    duration-ticks: 400 # 20 seconds exactly in 1.21.11 tick engines
+    burnout-duration-ticks: 300 # 15 seconds of burnout backlash
+    radius: 15
+    # Universal combat buffs injected on creation
+    buffs:
+      strength-level: 3
+      resistance-level: 2
+      speed-level: 2
+  
+  # Structural visual particle assignments
+  particles:
+    barrier-type: "TRIAL_SPAWNER_DETECTION_OMINOUS"
+    sukuna-open-shrine: "BLOCK_MARKER"
+
+# Individual Sorcerer Kit settings and balancing metrics
+techniques:
+  gojo:
+    ability1:
+      name: "Lapse Blue"
+      cost: 50
+      cooldown: 30 # Specified 30-second window
+    ability2:
+      name: "Reversal Red"
+      cost: 75
+      cooldown: 30 # Specified 30-second window
+    domain:
+      name: "Unlimited Void"
+
+  sukuna:
+    ability1:
+      name: "Dismantle"
+      cost: 30
+      cooldown: 5
+    ability2:
+      name: "Cleave"
+      cost: 60
+      cooldown: 15
+    domain:
+      name: "Malevolent Shrine"
+      open-radius: 30 # Doubled boundary calculation for open configuration
+
+  inumaki:
+    ability1:
+      name: "Don't Move!"
+      cost: 60
+      cooldown: 20
+      throat-recoil-damage: 2.0 # Hearts lost on cast
+    ability2:
+      name: "Plunge!"
+      cost: 100
+      cooldown: 30
+      throat-recoil-damage: 3.5
+    domain:
+      name: "Echoing Soundstage"
+
+  mahito:
+    ability1:
+      name: "Soul Strike"
+      cost: 30
+      cooldown: 0
+    ability2:
+      name: "Polymorphic Isomer"
+      cost: 120
+      cooldown: 45
+    domain:
+      name: "Self-Embodiment of Perfection"
+
+  yuji:
+    ability1:
+      name: "Divergent Fist"
+      cost-per-hit: 20
+    ability2:
+      name: "Manji Kick"
+      cost: 40
+      cooldown: 15
+    passive:
+      base-black-flash-chance: 0.05 # 5% Base critical conversion strike
+    domain:
+      name: "Pure Dominance"
+      boosted-black-flash-chance: 0.35 # Terrifying 35% boxing amplification
+
+  megumi:
+    ability1:
+      name: "Divine Dog: Totality"
+      cost: 100
+      cooldown: 45
+    ability2:
+      name: "Mahoraga"
+      cost: 1500 # Drastic endgame requirement
+      summon-chant: "§5With this treasure, I summon..."
+    utility:
+      shadow-inventory-cost: 10
+      slots: 9
+    domain:
+      name: "Chimera Shadow Garden"
