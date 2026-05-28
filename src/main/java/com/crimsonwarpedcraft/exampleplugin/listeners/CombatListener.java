@@ -6,16 +6,21 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class CombatListener implements Listener {
@@ -26,6 +31,44 @@ public class CombatListener implements Listener {
     public CombatListener(ExamplePlugin plugin) {
         this.plugin = plugin;
         this.ceKey = new NamespacedKey(plugin, "dropped_ce_amount");
+    }
+
+    // 🔒 GUARD RAIL: Prevents players from manually mining or breaking the Domain blocks
+    @EventHandler
+    public void onDomainBreak(BlockBreakEvent event) {
+        Block block = event.getBlock();
+        NamespacedKey blockKey = new NamespacedKey(plugin, "domain_block_" + block.getX() + "_" + block.getY() + "_" + block.getZ());
+        
+        if (block.getChunk().getPersistentDataContainer().has(blockKey, PersistentDataType.BYTE)) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage("§cYou cannot alter the layout of a Domain Expansion's inner world!");
+        }
+    }
+
+    // 🔒 GUARD RAIL: Prevents TNT or creepers from destroying Domain blocks
+    @EventHandler
+    public void onDomainExplode(EntityExplodeEvent event) {
+        Iterator<Block> iterator = event.blockList().iterator();
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            NamespacedKey blockKey = new NamespacedKey(plugin, "domain_block_" + block.getX() + "_" + block.getY() + "_" + block.getZ());
+            if (block.getChunk().getPersistentDataContainer().has(blockKey, PersistentDataType.BYTE)) {
+                iterator.remove(); // Safely removes the block from the explosion damage array list
+            }
+        }
+    }
+
+    // 🔒 GUARD RAIL: Prevents other block explosions from destroying Domain blocks
+    @EventHandler
+    public void onDomainBlockExplode(BlockExplodeEvent event) {
+        Iterator<Block> iterator = event.blockList().iterator();
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            NamespacedKey blockKey = new NamespacedKey(plugin, "domain_block_" + block.getX() + "_" + block.getY() + "_" + block.getZ());
+            if (block.getChunk().getPersistentDataContainer().has(blockKey, PersistentDataType.BYTE)) {
+                iterator.remove();
+            }
+        }
     }
 
     @EventHandler
@@ -47,7 +90,6 @@ public class CombatListener implements Listener {
             meta.setDisplayName("§d§lCrystallized Cursed Energy");
             meta.setLore(List.of("§7Right-Click to absorb its power.", "", "§fContains: §b" + ceToDrop + " CE"));
             meta.getPersistentDataContainer().set(ceKey, PersistentDataType.INTEGER, ceToDrop);
-            // CRITICAL FIX: The modified meta layer MUST be manually saved back to the item stack instance!
             crystal.setItemMeta(meta);
         }
         event.getDrops().add(crystal);
