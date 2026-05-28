@@ -26,7 +26,6 @@ public class PlayerProfile {
         this.cooldowns = new HashMap<>();
     }
 
-    // 🏆 GRADE ADVANCEMENT & BUFF ENGINE
     public void promoteToNextGrade() {
         switch (this.jujutsuGrade) {
             case "Grade 4" -> this.jujutsuGrade = "Grade 3";
@@ -41,12 +40,10 @@ public class PlayerProfile {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null || !player.isOnline()) return;
 
-        // Clear existing JJK buffs
         player.removePotionEffect(PotionEffectType.STRENGTH);
         player.removePotionEffect(PotionEffectType.SPEED);
         player.removePotionEffect(PotionEffectType.RESISTANCE);
 
-        // Apply buffs based on current rank (Amplitudes: 0 = Level 1, 1 = Level 2)
         switch (this.jujutsuGrade) {
             case "Special Grade" -> {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, -1, 2, false, false));
@@ -67,14 +64,13 @@ public class PlayerProfile {
         }
     }
 
-    // Getters and Setters
     public UUID getUuid() { return uuid; }
     public int getCursedEnergy() { return cursedEnergy; }
-    public void setCursedEnergy(int cursedEnergy) { this.cursedEnergy = cursedEnergy; }
+    public void setCursedEnergy(int ce) { this.cursedEnergy = Math.max(0, ce); }
     public int getMaxCursedEnergy() { return maxCursedEnergy; }
-    public void setMaxCursedEnergy(int maxCursedEnergy) { this.maxCursedEnergy = maxCursedEnergy; }
+    public void setMaxCursedEnergy(int max) { this.maxCursedEnergy = max; }
     public TechniqueType getTechnique() { return technique; }
-    public void setTechnique(TechniqueType technique) { this.technique = technique; }
+    public void setTechnique(TechniqueType tech) { this.technique = tech; }
     public String getGrade() { return jujutsuGrade; }
     public void setGrade(String grade) { this.jujutsuGrade = grade; applyGradeBuffs(); }
 
