@@ -1,14 +1,20 @@
-# =========================================================
-#             CRIMSON WARPED CRAFT: JJK CONFIG
-# =========================================================
+# =====================================================================
+# GLOBAL CONFIGURATION SECTIONS
+# =====================================================================
 
 cooldowns:
-  ability1: 5       # Global/Base fallback cooldown for Ability 1 (seconds)
-  ability2: 12      # Global/Base fallback cooldown for Ability 2 (seconds)
-  domain: 120       # Global/Base fallback cooldown for Domain Expansion (seconds)
-  burnout-duration: 20 # How long Domain Burnout completely disables moves (seconds)
+  ability1: 5
+  ability2: 12
+  domain: 120
+  burnout-duration: 20
 
-techniques:
+adminsection:
+  debug-mode: false
+  allow-creative-free-ce: true
+  max-ce-cap-limit: 5000
+  bypass-cooldowns: false
+
+sections:
   gojo:
     blue-ce-cost: 25
     blue-damage: 5.0
@@ -18,7 +24,6 @@ techniques:
     red-damage: 12.0
     red-knockback: 2.5
     red-cooldown: 15
-
   sukuna:
     dismantle-ce-cost: 15
     dismantle-damage: 7.0
@@ -26,13 +31,11 @@ techniques:
     cleave-ce-cost: 30
     cleave-damage: 15.0
     cleave-cooldown: 10
-
   megumi:
     dog-ce-cost: 20
     dog-cooldown: 8
     mahoraga-ce-cost: 150
     mahoraga-cooldown: 60
-
   yuji:
     divergent-ce-cost: 15
     divergent-first-damage: 4.0
@@ -41,7 +44,6 @@ techniques:
     manji-ce-cost: 30
     manji-damage: 9.0
     manji-cooldown: 12
-
   inumaki:
     dontmove-ce-cost: 40
     dontmove-recoil: 2.0
@@ -50,7 +52,6 @@ techniques:
     plunge-recoil: 3.0
     plunge-damage: 10.0
     plunge-cooldown: 18
-
   mahito:
     soulstrike-ce-cost: 35
     soulstrike-damage: 14.0
