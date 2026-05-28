@@ -12,7 +12,8 @@ public class ExamplePlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        this.profileManager = new ProfileManager();
+        this.profileManager = new ProfileManager(this);
+        
         
         saveDefaultConfig();
 
