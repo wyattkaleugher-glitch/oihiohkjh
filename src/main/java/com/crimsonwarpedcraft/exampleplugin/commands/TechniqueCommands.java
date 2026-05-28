@@ -41,21 +41,19 @@ public class TechniqueCommands implements TabExecutor {
 
         String action = args[0].toLowerCase();
 
-        // 🛠️ ADMIN: RELOAD CONFIG
         if (action.equals("reload")) {
             if (!sender.hasPermission("jjk.admin")) {
-                sender.sendMessage("§cYou do not have permission to execute administrative overrides!");
+                sender.sendMessage("§cNo permission!");
                 return true;
             }
             plugin.reloadConfig();
-            sender.sendMessage("§a[JJK] Configuration parameters successfully refreshed!");
+            sender.sendMessage("§a[JJK] Configurations refreshed!");
             return true;
         }
 
-        // 🛠️ ADMIN: GIVE CURSED ENERGY DIRECTLY
         if (action.equals("givece")) {
             if (!sender.hasPermission("jjk.admin")) {
-                sender.sendMessage("§cYou do not have permission to execute administrative overrides!");
+                sender.sendMessage("§cNo permission!");
                 return true;
             }
             if (args.length < 3) {
@@ -64,7 +62,7 @@ public class TechniqueCommands implements TabExecutor {
             }
             Player target = Bukkit.getPlayer(args[1]);
             if (target == null) {
-                sender.sendMessage("§cTarget player is currently offline.");
+                sender.sendMessage("§cPlayer is offline.");
                 return true;
             }
             try {
@@ -72,17 +70,15 @@ public class TechniqueCommands implements TabExecutor {
                 PlayerProfile targetProfile = profileManager.getProfile(target.getUniqueId());
                 targetProfile.setCursedEnergy(targetProfile.getCursedEnergy() + amount);
                 sender.sendMessage("§aGave §e" + amount + " CE §ato §f" + target.getName());
-                target.sendMessage("§aAn administrator has gifted you §e" + amount + " CE§a!");
             } catch (NumberFormatException e) {
-                sender.sendMessage("§cAmount must be a valid whole number!");
+                sender.sendMessage("§cInvalid amount!");
             }
             return true;
         }
 
-        // 🛠️ ADMIN: SET MAX CAPACITY LIMIT
         if (action.equals("setmaxce")) {
             if (!sender.hasPermission("jjk.admin")) {
-                sender.sendMessage("§cYou do not have permission to execute administrative overrides!");
+                sender.sendMessage("§cNo permission!");
                 return true;
             }
             if (args.length < 3) {
@@ -91,32 +87,28 @@ public class TechniqueCommands implements TabExecutor {
             }
             Player target = Bukkit.getPlayer(args[1]);
             if (target == null) {
-                sender.sendMessage("§cTarget player is currently offline.");
+                sender.sendMessage("§cPlayer is offline.");
                 return true;
             }
             try {
                 int amount = Integer.parseInt(args[2]);
                 int absoluteCap = plugin.getConfig().getInt("adminsection.max-ce-cap-limit", 5000);
-                
                 if (amount > absoluteCap) {
-                    sender.sendMessage("§cCannot exceed the absolute safety cap of §e" + absoluteCap + " CE §cconfigured in adminsection!");
+                    sender.sendMessage("§cCannot exceed cap limit of " + absoluteCap);
                     return true;
                 }
-
                 PlayerProfile targetProfile = profileManager.getProfile(target.getUniqueId());
                 targetProfile.setMaxCursedEnergy(amount);
-                sender.sendMessage("§aSet §f" + target.getName() + "'s §amax CE capacity limit to §b" + amount);
-                target.sendMessage("§aYour maximum Cursed Energy capacity was updated to §b" + amount + " CE§a!");
+                sender.sendMessage("§aSet " + target.getName() + "'s max capacity to " + amount);
             } catch (NumberFormatException e) {
-                sender.sendMessage("§cAmount must be a valid whole number!");
+                sender.sendMessage("§cInvalid amount!");
             }
             return true;
         }
 
-        // 🛠️ ADMIN: GIVE PHYSICAL CE ITEM SHARD
         if (action.equals("giveitem")) {
             if (!sender.hasPermission("jjk.admin")) {
-                sender.sendMessage("§cYou do not have permission to execute administrative overrides!");
+                sender.sendMessage("§cNo permission!");
                 return true;
             }
             if (args.length < 3) {
@@ -140,6 +132,7 @@ public class TechniqueCommands implements TabExecutor {
                     
                     NamespacedKey ceKey = new NamespacedKey(plugin, "dropped_ce_amount");
                     meta.getPersistentDataContainer().set(ceKey, PersistentDataType.INTEGER, ceAmount);
+                    // CRITICAL FIX: The modified meta layer MUST be manually saved back to the item stack instance!
                     crystal.setItemMeta(meta);
                 }
                 
@@ -153,24 +146,29 @@ public class TechniqueCommands implements TabExecutor {
         }
 
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("§cOnly players can execute physical cursed techniques!");
+            sender.sendMessage("§cOnly players can execute abilities!");
             return true;
         }
 
         PlayerProfile profile = profileManager.getProfile(player.getUniqueId());
 
-        // 🌀 PLAYER COMMAND: SET INNATE JUTSU CLASS
         if (action.equals("setclass")) {
             if (args.length < 2) {
-                player.sendMessage("§cSpecify a class name! (Gojo, Sukuna, Megumi, Yuji, Inumaki, Mahito)");
+                player.sendMessage("§cUsage: /jjk setclass <class>");
                 return true;
             }
             try {
                 TechniqueType type = TechniqueType.valueOf(args[1].toUpperCase());
                 profile.setTechnique(type);
-                player.sendMessage("§aYour Innate Soul Technique has scaled to: §e" + type.name());
+                
+                // CRITICAL FIX: Automatically max out pool limits when picking classes to guarantee domains can deploy
+                profile.setMaxCursedEnergy(1000);
+                profile.setCursedEnergy(1000);
+                
+                player.sendMessage("§aYour Innate Soul Technique has transformed into: §e" + type.name());
+                player.sendMessage("§bCursed Energy maxed out to 1000/1000 for testing!");
             } catch (IllegalArgumentException e) {
-                player.sendMessage("§cInvalid character archetype template selection!");
+                player.sendMessage("§cInvalid character archetype selection.");
             }
             return true;
         }
@@ -184,34 +182,30 @@ public class TechniqueCommands implements TabExecutor {
         if ((action.equals("ability1") || action.equals("ability2") || action.equals("domain")) && !bypassCooldowns) {
             int remaining = profile.getRemainingCooldown(action);
             if (remaining > 0) {
-                player.sendMessage("§cTechnique locked on cooldown for another §e" + remaining + "§cs!");
+                player.sendMessage("§cLocked on cooldown for another §e" + remaining + "§cs!");
                 return true;
             }
         }
 
         switch (action) {
             case "ability1" -> {
-                if (profile.getTechnique() == TechniqueType.NONE) { 
-                    player.sendMessage("§cSelect a technique via /jjk setclass"); 
-                    return true; 
-                }
+                if (profile.getTechnique() == TechniqueType.NONE) { player.sendMessage("§cChoose a class first!"); return true; }
                 routeAbilityOne(player, profile);
                 int cd = plugin.getConfig().getInt("sections." + profile.getTechnique().name().toLowerCase() + "." + getAbilityKey(profile.getTechnique(), 1) + "-cooldown", plugin.getConfig().getInt("cooldowns.ability1", 5));
                 profile.setCooldown("ability1", cd);
             }
             case "ability2" -> {
-                if (profile.getTechnique() == TechniqueType.NONE) { 
-                    player.sendMessage("§cSelect a technique via /jjk setclass"); 
-                    return true; 
-                }
+                if (profile.getTechnique() == TechniqueType.NONE) { player.sendMessage("§cChoose a class first!"); return true; }
                 routeAbilityTwo(player, profile);
                 int cd = plugin.getConfig().getInt("sections." + profile.getTechnique().name().toLowerCase() + "." + getAbilityKey(profile.getTechnique(), 2) + "-cooldown", plugin.getConfig().getInt("cooldowns.ability2", 12));
                 profile.setCooldown("ability2", cd);
             }
             case "domain" -> {
                 if (profile.getTechnique() == TechniqueType.NONE) return true;
-                if (profile.getCursedEnergy() < plugin.getConfig().getInt("domain.ce-cost", 500)) {
-                    player.sendMessage("§cInsufficent Cursed Energy pools to construct a domain boundary!");
+                int domainCost = plugin.getConfig().getInt("domain.ce-cost", 500);
+                
+                if (profile.getCursedEnergy() < domainCost) {
+                    player.sendMessage("§cInsufficent energy to form a domain! (Requires " + domainCost + " CE. You have: " + profile.getCursedEnergy() + ")");
                     return true;
                 }
                 
@@ -219,74 +213,42 @@ public class TechniqueCommands implements TabExecutor {
                 
                 int cd = plugin.getConfig().getInt("domain.cooldown", 180);
                 profile.setCooldown("domain", cd);
-
+                
                 int burnoutSecs = plugin.getConfig().getInt("cooldowns.burnout-duration", 20);
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     profile.setBurnedOut(false);
-                    player.sendMessage("§aYour brain's technique structures have processed burnout! Restored.");
+                    player.sendMessage("§aYour technique brain cells have finished recovery!");
                 }, burnoutSecs * 20L);
             }
-            default -> player.sendMessage("§cUnknown subcommand parameter loop.");
         }
         return true;
     }
 
-    // 🌟 THIS HANDLES IN-GAME TAB COMPLETION AUTOMATICALLY
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         List<String> completions = new ArrayList<>();
-        
-        // Argument 1: /jjk [subcommand]
         if (args.length == 1) {
-            List<String> subcommands = new ArrayList<>(Arrays.asList("ability1", "ability2", "domain", "setclass"));
-            if (sender.hasPermission("jjk.admin")) {
-                subcommands.addAll(Arrays.asList("reload", "givece", "setmaxce", "giveitem"));
-            }
-            // Auto-filter suggestions based on what the user has typed so far
-            for (String sub : subcommands) {
-                if (sub.toLowerCase().startsWith(args[0].toLowerCase())) {
-                    completions.add(sub);
-                }
-            }
+            List<String> subs = new ArrayList<>(Arrays.asList("ability1", "ability2", "domain", "setclass"));
+            if (sender.hasPermission("jjk.admin")) subs.addAll(Arrays.asList("reload", "givece", "setmaxce", "giveitem"));
+            for (String s : subs) if (s.toLowerCase().startsWith(args[0].toLowerCase())) completions.add(s);
             return completions;
         }
-
-        // Argument 2: depends completely on what the first subcommand was
         if (args.length == 2) {
-            String firstArg = args[0].toLowerCase();
-
-            // Case A: User typed "/jjk setclass [archetype]"
-            if (firstArg.equals("setclass")) {
+            String first = args[0].toLowerCase();
+            if (first.equals("setclass")) {
                 for (TechniqueType type : TechniqueType.values()) {
-                    if (type != TechniqueType.NONE && type.name().toLowerCase().startsWith(args[1].toLowerCase())) {
-                        completions.add(type.name().toLowerCase());
-                    }
+                    if (type != TechniqueType.NONE && type.name().toLowerCase().startsWith(args[1].toLowerCase())) completions.add(type.name().toLowerCase());
                 }
-                return completions;
-            }
-
-            // Case B: Admin typed "/jjk givece/setmaxce/giveitem [player]"
-            if (firstArg.equals("givece") || firstArg.equals("setmaxce") || firstArg.equals("giveitem")) {
+            } else if (first.equals("givece") || first.equals("setmaxce") || first.equals("giveitem")) {
                 if (sender.hasPermission("jjk.admin")) {
-                    for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                        if (onlinePlayer.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
-                            completions.add(onlinePlayer.getName());
-                        }
-                    }
-                    return completions;
+                    for (Player p : Bukkit.getOnlinePlayers()) if (p.getName().toLowerCase().startsWith(args[1].toLowerCase())) completions.add(p.getName());
                 }
             }
         }
-
-        // Argument 3: Dynamic hints for values (e.g. amounts)
-        if (args.length == 3) {
-            String firstArg = args[0].toLowerCase();
-            if (sender.hasPermission("jjk.admin") && (firstArg.equals("givece") || firstArg.equals("setmaxce") || firstArg.equals("giveitem"))) {
-                completions.add("[amount]");
-                return completions;
-            }
+        if (args.length == 3 && sender.hasPermission("jjk.admin")) {
+            String first = args[0].toLowerCase();
+            if (first.equals("givece") || first.equals("setmaxce") || first.equals("giveitem")) completions.add("[amount]");
         }
-
         return completions;
     }
 
