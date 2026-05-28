@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.Random;
 
@@ -24,29 +25,33 @@ public class JoinListener implements Listener {
     public void onFirstJoinAssignment(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         
-        // Verifies if the Minecraft engine registers them as completely new
         if (!player.hasPlayedBefore()) {
             PlayerProfile profile = plugin.getProfileManager().getProfile(player.getUniqueId());
             
-            // Collect all valid Techniques excluding NONE
             TechniqueType[] templates = TechniqueType.values();
             TechniqueType selectedType = TechniqueType.NONE;
             
-            // Keep pulling until we get a real character trait slot
             while (selectedType == TechniqueType.NONE) {
                 selectedType = templates[random.nextInt(templates.length)];
             }
             
-            // Set values completely inside profile memory
             profile.setTechnique(selectedType);
             profile.setMaxCursedEnergy(1000);
             profile.setCursedEnergy(1000);
+            profile.setGrade("Grade 4"); // Sets starting default tier
             
-            // Broadcast the awakening celebration notice string
+            plugin.getProfileManager().saveProfile(player.getUniqueId());
+
             player.sendMessage("§b§m---------------------------------------------");
             player.sendMessage("§e§l   SOUL AWAKENING DETECTED!");
             player.sendMessage("§7 You have been born with the Innate Technique: §d§l" + selectedType.name());
             player.sendMessage("§b§m---------------------------------------------");
         }
+    }
+
+    // 🔒 GUARD RAIL: Saves data to the disk storage file whenever a player logs off
+    @EventHandler
+    public void onPlayerLeaveSave(PlayerQuitEvent event) {
+        plugin.getProfileManager().unloadProfile(event.getPlayer().getUniqueId());
     }
 }
