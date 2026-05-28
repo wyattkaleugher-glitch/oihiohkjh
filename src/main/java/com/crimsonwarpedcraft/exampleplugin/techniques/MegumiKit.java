@@ -15,7 +15,7 @@ public class MegumiKit {
         int ceCost = config.getInt("techniques.megumi.dog-ce-cost", 20);
 
         if (profile.getCursedEnergy() < ceCost) {
-            player.sendMessage("§cNot enough Cursed Energy (" + ceCost + " required)!");
+            player.sendMessage("§cNot enough Cursed Energy!");
             return;
         }
         profile.setCursedEnergy(profile.getCursedEnergy() - ceCost);
@@ -36,7 +36,7 @@ public class MegumiKit {
         int ceCost = config.getInt("techniques.megumi.mahoraga-ce-cost", 150);
 
         if (profile.getCursedEnergy() < ceCost) {
-            player.sendMessage("§cNot enough Cursed Energy (" + ceCost + " required)!");
+            player.sendMessage("§cNot enough Cursed Energy!");
             return;
         }
         profile.setCursedEnergy(profile.getCursedEnergy() - ceCost);
@@ -49,10 +49,5 @@ public class MegumiKit {
         IronGolem mahoraga = (IronGolem) player.getWorld().spawnEntity(spawnLoc, EntityType.IRON_GOLEM);
         mahoraga.setCustomName("§5§lDivine General Mahoraga");
         mahoraga.setCustomNameVisible(true);
-    }
-
-    public static void openShadowInventory(Player player) {
-        player.sendMessage("§8§lSinking into the shadow...");
-        player.playSound(player.getLocation(), Sound.BLOCK_LONG_GRASS_STEP, 1.0F, 0.5F);
     }
 }
