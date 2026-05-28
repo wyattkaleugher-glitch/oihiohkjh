@@ -37,7 +37,9 @@ tasks.withType(JavaCompile).configureEach {
 
 // Tests are not used in this project; disable the test task so `build` doesn't
 //   fail trying to load the JUnit Platform launcher.
-
+tasks.matching { it.name.contains("test") || it.name.contains("Test") }.all {
+    enabled = false
+}
 
 processResources {
     def props = [version: version]
