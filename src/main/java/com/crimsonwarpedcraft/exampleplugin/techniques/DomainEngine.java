@@ -21,7 +21,8 @@ import java.util.UUID;
 public class DomainEngine {
 
     public static void launchDomain(Player player, PlayerProfile profile, FileConfiguration config) {
-        ExamplePlugin plugin = JavaPlugin.getProvidingPlugin(ExamplePlugin.class);
+        // FIXED: Added explicit (ExamplePlugin) cast to resolve the JavaPlugin type mismatch error
+        ExamplePlugin plugin = (ExamplePlugin) JavaPlugin.getProvidingPlugin(ExamplePlugin.class);
         
         int ceCost = config.getInt("domain.ce-cost", 500);
         int radius = config.getInt("domain.radius", 10);
@@ -38,7 +39,7 @@ public class DomainEngine {
             if (rival != null && rival.isOnline()) {
                 PlayerProfile rivalProfile = plugin.getProfileManager().getProfile(rivalUuid);
                 
-                // Convert their assigned text grades into numeric weights for comparison
+                // Convert assigned text grades into numeric weights for priority comparison
                 int userWeight = getGradeWeight(profile.getGrade());
                 int rivalWeight = getGradeWeight(rivalProfile.getGrade());
 
@@ -83,8 +84,6 @@ public class DomainEngine {
         // Proceed with normal, uninterrupted domain generation if no clash/stalemate occurred
         plugin.getDomainManager().registerDomain(player.getUniqueId(), center);
         player.sendMessage("§0§lDomain Expansion!!");
-        
-        NamespacedKey pluginKey = new NamespacedKey(plugin, "domain_barrier");
 
         // Generate the physical protective outer shell boundary box layout
         for (int x = -radius; x <= radius; x++) {
@@ -119,7 +118,6 @@ public class DomainEngine {
         // Clean up and unregister the domain safely after 15 seconds so players aren't trapped forever
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             plugin.getDomainManager().unregisterDomain(player.getUniqueId());
-            // (Optional: You can add code here later to clear the concrete blocks back into air)
         }, 300L); // 15 seconds (300 ticks)
     }
 
