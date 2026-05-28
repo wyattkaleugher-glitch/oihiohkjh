@@ -5,50 +5,112 @@ import java.util.Map;
 import java.util.UUID;
 
 public class PlayerProfile {
-    private final UUID uuid;
-    private int cursedEnergy = 100;
-    private int maxCursedEnergy = 250; 
-    private TechniqueType technique = TechniqueType.NONE; 
-    private boolean isBurnedOut = false;
 
-    // Tracks cooldowns using the action key name and a system millisecond timestamp
-    private final Map<String, Long> cooldowns = new HashMap<>();
+    private final UUID uuid;
+    private int cursedEnergy;
+    private int maxCursedEnergy;
+    private TechniqueType technique;
+    private String jujutsuGrade;
+    
+    // Tracks individual ability cooldowns using expiration timestamps
+    private final Map<String, Long> cooldowns;
 
     public PlayerProfile(UUID uuid) {
         this.uuid = uuid;
+        this.cursedEnergy = 1000;
+        this.maxCursedEnergy = 1000;
+        this.technique = TechniqueType.NONE;
+        this.jujutsuGrade = "Grade 4"; // Default starting rank milestone
+        this.cooldowns = new HashMap<>();
     }
 
-    /**
-     * Sets a cooldown for a specific action key in seconds.
-     */
+    // 🏆 GRADE ADVANCEMENT FLOW
+    public void promoteToNextGrade() {
+        // Defines the exact step-by-step ladder progression
+        switch (this.jujutsuGrade) {
+            case "Grade 4" -> this.jujutsuGrade = "Grade 3";
+            case "Grade 3" -> this.jujutsuGrade = "Grade 2";
+            case "Grade 2" -> this.jujutsuGrade = "Grade 1";
+            case "Grade 1" -> this.jujutsuGrade = "Special Grade";
+            default -> {
+                // If they are already Special Grade or have a custom title, do not overwrite it
+            }
+        }
+    }
+
+    // 🔍 GETTERS & SETTERS: CORE FIELDS
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public int getCursedEnergy() {
+        return cursedEnergy;
+    }
+
+    public void setCursedEnergy(int cursedEnergy) {
+        // Keeps energy within safety boundaries (bounds: 0 to Max Limit)
+        if (cursedEnergy < 0) {
+            this.cursedEnergy = 0;
+        } else if (cursedEnergy > this.maxCursedEnergy) {
+            this.cursedEnergy = this.maxCursedEnergy;
+        } else {
+            this.cursedEnergy = cursedEnergy;
+        }
+    }
+
+    public int getMaxCursedEnergy() {
+        return maxCursedEnergy;
+    }
+
+    public void setMaxCursedEnergy(int maxCursedEnergy) {
+        this.maxCursedEnergy = Math.max(0, maxCursedEnergy);
+        // Secondary safety check: downscale active pool if it exceeds the new cap
+        if (this.cursedEnergy > this.maxCursedEnergy) {
+            this.cursedEnergy = this.maxCursedEnergy;
+        }
+    }
+
+    public TechniqueType getTechnique() {
+        return technique;
+    }
+
+    public void setTechnique(TechniqueType technique) {
+        this.technique = technique != null ? technique : TechniqueType.NONE;
+    }
+
+    public String getGrade() {
+        return jujutsuGrade;
+    }
+
+    public void setGrade(String grade) {
+        this.jujutsuGrade = grade != null ? grade : "Grade 4";
+    }
+
+    // ⏱️ COOLDOWN ENGINE LOGIC ROUTINES
     public void setCooldown(String actionKey, int seconds) {
-        if (seconds <= 0) return;
-        this.cooldowns.put(actionKey, System.currentTimeMillis() + (seconds * 1000L));
+        if (seconds <= 0) {
+            cooldowns.remove(actionKey.toLowerCase());
+        } else {
+            // Converts the expiration time into a permanent future millisecond stamp
+            cooldowns.put(actionKey.toLowerCase(), System.currentTimeMillis() + (seconds * 1000L));
+        }
     }
 
-    /**
-     * Checks if a cooldown is still active. If it is active, returns the remaining seconds.
-     * If it's expired or doesn't exist, returns 0.
-     */
     public int getRemainingCooldown(String actionKey) {
-        if (!cooldowns.containsKey(actionKey)) return 0;
-        long expireTime = cooldowns.get(actionKey);
-        long timeLeft = expireTime - System.currentTimeMillis();
-        
-        if (timeLeft <= 0) {
-            cooldowns.remove(actionKey);
+        Long expireTime = cooldowns.get(actionKey.toLowerCase());
+        if (expireTime == null) return 0;
+
+        long remainingMillis = expireTime - System.currentTimeMillis();
+        if (remainingMillis <= 0) {
+            cooldowns.remove(actionKey.toLowerCase()); // Cleanup memory profile leaks
             return 0;
         }
-        return (int) Math.ceil(timeLeft / 1000.0);
+
+        // Round up to the nearest whole second parameter
+        return (int) Math.ceil(remainingMillis / 1000.0);
     }
 
-    public UUID getUuid() { return uuid; }
-    public int getCursedEnergy() { return cursedEnergy; }
-    public void setCursedEnergy(int ce) { this.cursedEnergy = Math.max(0, Math.min(ce, this.maxCursedEnergy)); }
-    public int getMaxCursedEnergy() { return maxCursedEnergy; }
-    public void setMaxCursedEnergy(int max) { this.maxCursedEnergy = max; }
-    public TechniqueType getTechnique() { return technique; }
-    public void setTechnique(TechniqueType technique) { this.technique = technique; }
-    public boolean isBurnedOut() { return isBurnedOut; }
-    public void setBurnedOut(boolean b) { this.isBurnedOut = b; }
+    public boolean hasCooldown(String actionKey) {
+        return getRemainingCooldown(actionKey) > 0;
+    }
 }
