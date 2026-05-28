@@ -132,7 +132,6 @@ public class TechniqueCommands implements TabExecutor {
                     
                     NamespacedKey ceKey = new NamespacedKey(plugin, "dropped_ce_amount");
                     meta.getPersistentDataContainer().set(ceKey, PersistentDataType.INTEGER, ceAmount);
-                    // CRITICAL FIX: The modified meta layer MUST be manually saved back to the item stack instance!
                     crystal.setItemMeta(meta);
                 }
                 
@@ -161,7 +160,6 @@ public class TechniqueCommands implements TabExecutor {
                 TechniqueType type = TechniqueType.valueOf(args[1].toUpperCase());
                 profile.setTechnique(type);
                 
-                // CRITICAL FIX: Automatically max out pool limits when picking classes to guarantee domains can deploy
                 profile.setMaxCursedEnergy(1000);
                 profile.setCursedEnergy(1000);
                 
@@ -173,10 +171,7 @@ public class TechniqueCommands implements TabExecutor {
             return true;
         }
 
-        if (profile.isBurnedOut()) {
-            player.sendMessage("§cYour neural structures are fried from Domain Burnout!");
-            return true;
-        }
+        // BURNOUT VERIFICATION PASS COMPONENT REMOVED FROM THIS ROUTINE STACK AREA
 
         boolean bypassCooldowns = plugin.getConfig().getBoolean("adminsection.bypass-cooldowns", false);
         if ((action.equals("ability1") || action.equals("ability2") || action.equals("domain")) && !bypassCooldowns) {
@@ -214,11 +209,7 @@ public class TechniqueCommands implements TabExecutor {
                 int cd = plugin.getConfig().getInt("domain.cooldown", 180);
                 profile.setCooldown("domain", cd);
                 
-                int burnoutSecs = plugin.getConfig().getInt("cooldowns.burnout-duration", 20);
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    profile.setBurnedOut(false);
-                    player.sendMessage("§aYour technique brain cells have finished recovery!");
-                }, burnoutSecs * 20L);
+                // DATA RECOVERY DELAY RUNNABLE PIPELINE REMOVED TO PREVENT BURNOUT SYSTEM ACTIVATION LOCKS
             }
         }
         return true;
