@@ -1,66 +1,42 @@
-# =====================================================================
-# GLOBAL CONFIGURATION SECTIONS
-# =====================================================================
+# ==========================================
+# JJK Plugin - Technique Configuration
+# ==========================================
 
-cooldowns:
-  ability1: 5
-  ability2: 12
-  domain: 120
-  burnout-duration: 20
+# Damage values: 2.0 = 1 Heart
+# Levels: 0 = Level I, 1 = Level II, 2 = Level III, etc.
 
-adminsection:
-  debug-mode: false
-  allow-creative-free-ce: true
-  max-ce-cap-limit: 5000
-  bypass-cooldowns: false
-
-sections:
+kits:
   gojo:
-    blue-ce-cost: 25
-    blue-damage: 5.0
-    blue-range: 12.0
-    blue-cooldown: 4
-    red-ce-cost: 50
-    red-damage: 12.0
-    red-knockback: 2.5
-    red-cooldown: 15
+    blue-damage: 4.0
+    red-damage: 8.0
+    
   sukuna:
-    dismantle-ce-cost: 15
-    dismantle-damage: 7.0
-    dismantle-cooldown: 3
-    cleave-ce-cost: 30
-    cleave-damage: 15.0
-    cleave-cooldown: 10
-  megumi:
-    dog-ce-cost: 20
-    dog-cooldown: 8
-    mahoraga-ce-cost: 150
-    mahoraga-cooldown: 60
+    cleave-damage: 10.0
+    dismantle-damage: 6.0
+    
   yuji:
-    divergent-ce-cost: 15
-    divergent-first-damage: 4.0
-    divergent-second-damage: 8.0
-    divergent-cooldown: 5
-    manji-ce-cost: 30
-    manji-damage: 9.0
-    manji-cooldown: 12
-  inumaki:
-    dontmove-ce-cost: 40
-    dontmove-recoil: 2.0
-    dontmove-cooldown: 10
-    plunge-ce-cost: 50
-    plunge-recoil: 3.0
-    plunge-damage: 10.0
-    plunge-cooldown: 18
+    divergent-damage: 6.0
+    black-flash-damage: 20.0
+    
   mahito:
-    soulstrike-ce-cost: 35
-    soulstrike-damage: 14.0
-    soulstrike-cooldown: 6
-    isomer-ce-cost: 70
-    isomer-cooldown: 25
-
-domain:
-  ce-cost: 500
+    heal-level: 2 # Regeneration III
+    repel-damage: 8.0
+    
+  inumaki:
+    dont-move-damage: 3.0
+    blast-damage: 7.0
+    
+  megumi:
+    mahoraga:
+      health: 200.0        # 100 Hearts
+      speed-level: 3       # Speed IV
+      strength-level: 1    # Strength II
+      lifespan-seconds: 60 # How long he stays before despawning
+      
+# ==========================================
+# Domain Settings
+# ==========================================
+domains:
   radius: 8
-  surehit-damage: 16.0
-  cooldown: 180
+  duration-ticks: 400      # 20 seconds
+  unbreakable: true        # Prevents block breaking inside
