@@ -29,9 +29,18 @@ public class PlayerProfile {
     public void applyGradeBuffs() {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null || !player.isOnline()) return;
+
         player.removePotionEffect(PotionEffectType.STRENGTH);
         player.removePotionEffect(PotionEffectType.SPEED);
         player.removePotionEffect(PotionEffectType.RESISTANCE);
+
+        // NEW: Mahoraga specific buff check
+        if (this.jujutsuGrade.equalsIgnoreCase("Mahoraga")) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, -1, 1, false, false));    // Strength II
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, -1, 3, false, false));       // Speed IV
+            player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, -1, 0, false, false));  // Resistance I
+            return;
+        }
 
         switch (this.jujutsuGrade) {
             case "Special Grade" -> {
@@ -51,14 +60,12 @@ public class PlayerProfile {
         }
     }
 
-    public void clearAllCooldowns() {
-        this.cooldowns.clear();
-    }
+    public void clearAllCooldowns() { this.cooldowns.clear(); }
 
     public void reduceAllCooldowns(int seconds) {
         long reductionMillis = seconds * 1000L;
-        for (Map.Entry<String, Long> entry : cooldowns.entrySet()) {
-            cooldowns.put(entry.getKey(), entry.getValue() - reductionMillis);
+        for (String key : cooldowns.keySet()) {
+            cooldowns.put(key, cooldowns.get(key) - reductionMillis);
         }
     }
 
