@@ -34,11 +34,10 @@ public class PlayerProfile {
         player.removePotionEffect(PotionEffectType.SPEED);
         player.removePotionEffect(PotionEffectType.RESISTANCE);
 
-        // NEW: Mahoraga specific buff check
         if (this.jujutsuGrade.equalsIgnoreCase("Mahoraga")) {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, -1, 1, false, false));    // Strength II
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, -1, 3, false, false));       // Speed IV
-            player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, -1, 0, false, false));  // Resistance I
+            player.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, -1, 1, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, -1, 3, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, -1, 0, false, false));
             return;
         }
 
