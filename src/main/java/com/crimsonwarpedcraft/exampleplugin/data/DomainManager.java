@@ -7,17 +7,20 @@ import java.util.UUID;
 
 public class DomainManager {
     private final Map<UUID, Location> activeDomains = new HashMap<>();
-    private final int RADIUS = 10;
+    private final int RADIUS = 8;
 
     public void registerDomain(UUID id, Location loc) { activeDomains.put(id, loc); }
     public void unregisterDomain(UUID id) { activeDomains.remove(id); }
     public boolean hasActiveDomain(UUID id) { return activeDomains.containsKey(id); }
-    
-    public boolean isInside(UUID id, Location current) {
-        Location center = activeDomains.get(id);
-        if (center == null || !current.getWorld().equals(center.getWorld())) return false;
-        return current.distance(center) <= RADIUS;
+
+    public boolean isInsideAnyDomain(Location loc) {
+        for (Location center : activeDomains.values()) {
+            if (center.getWorld().equals(loc.getWorld())) {
+                if (center.distance(loc) <= RADIUS + 1) return true;
+            }
+        }
+        return false;
     }
-    
+
     public void clearAll() { activeDomains.clear(); }
 }
