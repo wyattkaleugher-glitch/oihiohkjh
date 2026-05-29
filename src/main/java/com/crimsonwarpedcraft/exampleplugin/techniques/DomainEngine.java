@@ -14,10 +14,10 @@ public class DomainEngine {
         ExamplePlugin plugin = (ExamplePlugin) JavaPlugin.getProvidingPlugin(ExamplePlugin.class);
         Location center = player.getLocation();
         int radius = 10;
-        NamespacedKey blockMark = new NamespacedKey(plugin, "domain_barrier");
 
         plugin.getDomainManager().registerDomain(player.getUniqueId(), center);
 
+        // Visuals
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y <= radius; y++) {
                 for (int z = -radius; z <= radius; z++) {
@@ -25,6 +25,7 @@ public class DomainEngine {
                     if (dist >= radius - 0.8 && dist <= radius + 0.5) {
                         Block b = center.clone().add(x, y, z).getBlock();
                         b.setType(dist > radius ? Material.CRYING_OBSIDIAN : Material.TINTED_GLASS);
+                        
                         b.getChunk().getPersistentDataContainer().set(
                             new NamespacedKey(plugin, "domain_block_" + b.getX() + "_" + b.getY() + "_" + b.getZ()), 
                             PersistentDataType.BYTE, (byte) 1
@@ -34,9 +35,10 @@ public class DomainEngine {
             }
         }
 
-        // 🚀 Sure-Hit Buff: Tick cooldowns 4x faster (reduces by 3 extra seconds every 1 second)
+        // 🚀 Sure-Hit Buff: Tick cooldowns 4x faster
         Bukkit.getScheduler().runTaskTimer(plugin, (task) -> {
-            if (!player.isOnline() || !plugin.getDomainManager().isInside(player.getUniqueId(), player.getLocation())) {
+            // Check if player still owns a domain. If location is null, domain ended.
+            if (!player.isOnline() || plugin.getDomainManager().getDomainLocation(player.getUniqueId()) == null) {
                 task.cancel();
                 return;
             }
@@ -45,6 +47,7 @@ public class DomainEngine {
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             plugin.getDomainManager().unregisterDomain(player.getUniqueId());
+            player.sendMessage("§cYour domain has collapsed.");
         }, 400L);
     }
 }
