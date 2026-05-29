@@ -14,14 +14,13 @@ public class YujiKit {
     public static void execute(Player p, PlayerProfile prof, int slot) {
         ExamplePlugin plugin = JavaPlugin.getPlugin(ExamplePlugin.class);
         if (slot == 1) { // Divergent Fist
-            double dmg = plugin.getConfig().getDouble("kits.yuji.divergent-damage", 4.0);
+            double dmg = plugin.getConfig().getDouble("kits.yuji.divergent-damage", 5.0);
             p.sendMessage("§f§lDivergent Fist");
-            for (Entity e : p.getNearbyEntities(3, 3, 3)) {
+            for (Entity e : p.getNearbyEntities(4, 4, 4)) {
                 if (e instanceof LivingEntity target && !e.equals(p)) {
                     target.damage(dmg, p);
                     Bukkit.getScheduler().runTaskLater(plugin, () -> {
                         target.damage(dmg * 1.5, p);
-                        target.getWorld().spawnParticle(Particle.CRIT, target.getLocation(), 10);
                     }, 10L);
                 }
             }
@@ -29,7 +28,7 @@ public class YujiKit {
         } else if (slot == 2) { // Black Flash
             double dmg = plugin.getConfig().getDouble("kits.yuji.black-flash-damage", 20.0);
             p.sendMessage("§0§lBLACK FLASH!");
-            for (Entity e : p.getNearbyEntities(4, 4, 4)) {
+            for (Entity e : p.getNearbyEntities(5, 5, 5)) {
                 if (e instanceof LivingEntity target && !e.equals(p)) {
                     target.damage(dmg, p);
                     target.getWorld().spawnParticle(Particle.WITCH, target.getLocation(), 100);
