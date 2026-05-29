@@ -1,7 +1,10 @@
 package com.crimsonwarpedcraft.exampleplugin.data;
 
 import com.crimsonwarpedcraft.exampleplugin.ExamplePlugin;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,54 +22,48 @@ public class ProfileManager {
     }
 
     public PlayerProfile getProfile(UUID uuid) {
-        return profiles.computeIfAbsent(uuid, k -> loadProfile(uuid));
-    }
-
-    // 💾 LOADS PLAYER VALUES FROM COMPILER MEMORY STORAGE
-    private PlayerProfile loadProfile(UUID uuid) {
-        PlayerProfile profile = new PlayerProfile(uuid);
-        File file = new File(plugin.getDataFolder() + "/playerdata", uuid.toString() + ".yml");
-        
-        if (file.exists()) {
-            YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-            profile.setCursedEnergy(config.getInt("cursed-energy", 1000));
-            profile.setMaxCursedEnergy(config.getInt("max-cursed-energy", 1000));
-            
-            try {
-                profile.setTechnique(TechniqueType.valueOf(config.getString("technique", "NONE")));
-            } catch (Exception e) {
-                profile.setTechnique(TechniqueType.NONE);
-            }
-            
-            // Reads their custom assigned Jujutsu rank grade string
-            profile.setGrade(config.getString("jujutsu-grade", "Grade 4"));
-        } else {
-            // Raw Default Initializations
-            profile.setGrade("Grade 4");
+        if (!profiles.containsKey(uuid)) {
+            loadProfile(uuid);
         }
-        return profile;
+        return profiles.get(uuid);
     }
 
-    // 💾 SAVES THE STRUCTURAL DATA STACK TO STORAGE DISK
+    public void loadProfile(UUID uuid) {
+        File file = new File(plugin.getDataFolder() + "/players", uuid + ".yml");
+        PlayerProfile profile = new PlayerProfile(uuid);
+
+        if (file.exists()) {
+            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+            profile.setCursedEnergy(config.getInt("ce"));
+            profile.setMaxCursedEnergy(config.getInt("max-ce"));
+            profile.setTechnique(TechniqueType.valueOf(config.getString("technique")));
+            profile.setGrade(config.getString("grade"));
+        }
+        profiles.put(uuid, profile);
+    }
+
     public void saveProfile(UUID uuid) {
         PlayerProfile profile = profiles.get(uuid);
         if (profile == null) return;
 
-        File dataFolder = new File(plugin.getDataFolder(), "playerdata");
-        if (!dataFolder.exists()) dataFolder.mkdirs();
+        File file = new File(plugin.getDataFolder() + "/players", uuid + ".yml");
+        FileConfiguration config = new YamlConfiguration();
 
-        File file = new File(dataFolder, uuid.toString() + ".yml");
-        YamlConfiguration config = new YamlConfiguration();
-
-        config.set("cursed-energy", profile.getCursedEnergy());
-        config.set("max-cursed-energy", profile.getMaxCursedEnergy());
+        config.set("ce", profile.getCursedEnergy());
+        config.set("max-ce", profile.getMaxCursedEnergy());
         config.set("technique", profile.getTechnique().name());
-        config.set("jujutsu-grade", profile.getGrade());
+        config.set("grade", profile.getGrade());
 
         try {
             config.save(file);
         } catch (IOException e) {
-            plugin.getLogger().severe("Could not freeze player data stack for: " + uuid);
+            e.printStackTrace();
+        }
+    }
+
+    public void saveAll() {
+        for (UUID uuid : profiles.keySet()) {
+            saveProfile(uuid);
         }
     }
 
