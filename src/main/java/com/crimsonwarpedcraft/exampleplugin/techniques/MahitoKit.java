@@ -1,57 +1,34 @@
 package com.crimsonwarpedcraft.exampleplugin.techniques;
 
+import com.crimsonwarpedcraft.exampleplugin.ExamplePlugin;
 import com.crimsonwarpedcraft.exampleplugin.data.PlayerProfile;
-import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Husk;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class MahitoKit {
-    public static void castSoulStrike(Player player, PlayerProfile profile, FileConfiguration config) {
-        int ceCost = config.getInt("techniques.mahito.soulstrike-ce-cost", 35);
-        double damage = config.getDouble("techniques.mahito.soulstrike-damage", 14.0);
-
-        if (profile.getCursedEnergy() < ceCost) {
-            player.sendMessage("§cNot enough Cursed Energy (" + ceCost + " required)!");
-            return;
-        }
-
-        var rayTrace = player.getWorld().rayTraceEntities(player.getEyeLocation(), player.getLocation().getDirection(), 4.0);
-        if (rayTrace == null || !(rayTrace.getHitEntity() instanceof LivingEntity target)) {
-            player.sendMessage("§cNo soul within arm's reach!");
-            return;
-        }
-
-        profile.setCursedEnergy(profile.getCursedEnergy() - ceCost);
-        player.sendMessage("§d§lIdle Transfiguration!");
-
-        target.damage(damage, player); 
-        Location loc = target.getLocation().add(0,1,0);
-        loc.getWorld().spawnParticle(Particle.WITCH, loc, 25, 0.3, 0.5, 0.3);
-        loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 0.7F);
-    }
-
-    public static void castPolymorphicIsomer(Player player, PlayerProfile profile, FileConfiguration config) {
-        int ceCost = config.getInt("techniques.mahito.isomer-ce-cost", 70);
-
-        if (profile.getCursedEnergy() < ceCost) {
-            player.sendMessage("§cNot enough Cursed Energy (" + ceCost + " required)!");
-            return;
-        }
-        profile.setCursedEnergy(profile.getCursedEnergy() - ceCost);
-        player.sendMessage("§5§lPolymorphic Isomer!");
-
-        Location spawnLoc = player.getLocation().add(player.getLocation().getDirection().multiply(2));
-        Husk isomer = (Husk) player.getWorld().spawnEntity(spawnLoc, EntityType.HUSK);
-        isomer.setCustomName("§5§lPolymorphic Isomer");
-        isomer.setCustomNameVisible(true);
-        isomer.setBaby(false);
+    public static void execute(Player p, PlayerProfile prof, int slot) {
+        ExamplePlugin plugin = JavaPlugin.getPlugin(ExamplePlugin.class);
         
-        spawnLoc.getWorld().spawnParticle(Particle.ENTITY_EFFECT, spawnLoc, 30);
-        spawnLoc.getWorld().playSound(spawnLoc, Sound.ENTITY_ZOMBIE_CONVERTED_TO_DROWNED, 1.0F, 0.5F);
+        if (slot == 1) { // Idle Transfiguration
+            p.sendMessage("§d§lIdle Transfiguration");
+            p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 100, 3));
+            p.playSound(p.getLocation(), Sound.BLOCK_CONDUIT_ACTIVATE, 1f, 1.5f);
+            prof.setCooldown("ability1", 15);
+        } else if (slot == 2) { // Soul Repel
+            double dmg = plugin.getConfig().getDouble("kits.mahito.repel-damage", 8.0);
+            p.sendMessage("§5§lSoul Repel!");
+            for (Entity e : p.getNearbyEntities(5, 5, 5)) {
+                if (e instanceof LivingEntity target && !e.equals(p)) {
+                    target.damage(dmg, p);
+                    target.setVelocity(target.getLocation().toVector().subtract(p.getLocation().toVector()).normalize().multiply(2));
+                }
+            }
+            prof.setCooldown("ability2", 12);
+        }
     }
 }
