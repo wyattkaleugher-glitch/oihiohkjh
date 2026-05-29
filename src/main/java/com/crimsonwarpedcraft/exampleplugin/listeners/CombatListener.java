@@ -2,7 +2,6 @@ package com.crimsonwarpedcraft.exampleplugin.listeners;
 
 import com.crimsonwarpedcraft.exampleplugin.ExamplePlugin;
 import com.crimsonwarpedcraft.exampleplugin.data.PlayerProfile;
-import com.crimsonwarpedcraft.exampleplugin.data.TechniqueType;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -25,7 +24,6 @@ public class CombatListener implements Listener {
     public void onDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player attacker) || !(event.getEntity() instanceof Player victim)) return;
 
-        // Prevents self-damage from abilities
         if (attacker.equals(victim)) {
             event.setCancelled(true);
             return;
@@ -36,7 +34,7 @@ public class CombatListener implements Listener {
             PlayerProfile vProf = plugin.getProfileManager().getProfile(victim.getUniqueId());
             vProf.setCooldown("ability1", 5);
             vProf.setCooldown("ability2", 5);
-            vProf.setCursedEnergy(vProf.getCursedEnergy() - 150);
+            vProf.setCursedEnergy(Math.max(0, vProf.getCursedEnergy() - 150));
             victim.sendMessage("§c§lNULLIFIED!");
             victim.playSound(victim.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 2f);
         }
@@ -48,7 +46,6 @@ public class CombatListener implements Listener {
         ItemStack item = event.getItem();
         if (item == null || !item.hasItemMeta()) return;
 
-        // CE Right-Click Absorption
         NamespacedKey ceKey = new NamespacedKey(plugin, "dropped_ce_amount");
         if (item.getItemMeta().getPersistentDataContainer().has(ceKey, PersistentDataType.INTEGER)) {
             if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -63,7 +60,6 @@ public class CombatListener implements Listener {
             return;
         }
 
-        // ISOH Domain Wall Breaking
         if (item.getItemMeta().getDisplayName().contains("Inverted Spear")) {
             if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
                 Block b = event.getClickedBlock();
