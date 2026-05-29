@@ -1,10 +1,8 @@
 package com.crimsonwarpedcraft.exampleplugin.data;
 
 import com.crimsonwarpedcraft.exampleplugin.ExamplePlugin;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,10 +32,15 @@ public class ProfileManager {
 
         if (file.exists()) {
             FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-            profile.setCursedEnergy(config.getInt("ce"));
-            profile.setMaxCursedEnergy(config.getInt("max-ce"));
-            profile.setTechnique(TechniqueType.valueOf(config.getString("technique")));
-            profile.setGrade(config.getString("grade"));
+            profile.setCursedEnergy(config.getInt("ce", 1000));
+            profile.setMaxCursedEnergy(config.getInt("max-ce", 1000));
+            String techName = config.getString("technique", "NONE");
+            try {
+                profile.setTechnique(TechniqueType.valueOf(techName));
+            } catch (IllegalArgumentException e) {
+                profile.setTechnique(TechniqueType.NONE);
+            }
+            profile.setGrade(config.getString("grade", "Grade 4"));
         }
         profiles.put(uuid, profile);
     }
