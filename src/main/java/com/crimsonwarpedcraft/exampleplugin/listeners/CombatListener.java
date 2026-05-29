@@ -25,7 +25,7 @@ public class CombatListener implements Listener {
     public void onDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player attacker) || !(event.getEntity() instanceof Player victim)) return;
 
-        // SELF DAMAGE FIX
+        // Prevents self-damage from abilities
         if (attacker.equals(victim)) {
             event.setCancelled(true);
             return;
@@ -38,6 +38,7 @@ public class CombatListener implements Listener {
             vProf.setCooldown("ability2", 5);
             vProf.setCursedEnergy(vProf.getCursedEnergy() - 150);
             victim.sendMessage("§c§lNULLIFIED!");
+            victim.playSound(victim.getLocation(), Sound.BLOCK_ANVIL_LAND, 1f, 2f);
         }
     }
 
@@ -47,10 +48,10 @@ public class CombatListener implements Listener {
         ItemStack item = event.getItem();
         if (item == null || !item.hasItemMeta()) return;
 
-        // CE ABSORPTION LOGIC
+        // CE Right-Click Absorption
         NamespacedKey ceKey = new NamespacedKey(plugin, "dropped_ce_amount");
         if (item.getItemMeta().getPersistentDataContainer().has(ceKey, PersistentDataType.INTEGER)) {
-            if (event.getAction().name().contains("RIGHT")) {
+            if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 int amt = item.getItemMeta().getPersistentDataContainer().get(ceKey, PersistentDataType.INTEGER);
                 PlayerProfile prof = plugin.getProfileManager().getProfile(player.getUniqueId());
                 prof.setCursedEnergy(prof.getCursedEnergy() + amt);
@@ -59,9 +60,10 @@ public class CombatListener implements Listener {
                 player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
                 event.setCancelled(true);
             }
+            return;
         }
 
-        // ISOH DOMAIN SHATTER
+        // ISOH Domain Wall Breaking
         if (item.getItemMeta().getDisplayName().contains("Inverted Spear")) {
             if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
                 Block b = event.getClickedBlock();
