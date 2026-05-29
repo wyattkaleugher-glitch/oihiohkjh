@@ -5,42 +5,34 @@ import com.crimsonwarpedcraft.exampleplugin.data.DomainManager;
 import com.crimsonwarpedcraft.exampleplugin.data.ProfileManager;
 import com.crimsonwarpedcraft.exampleplugin.listeners.CombatListener;
 import com.crimsonwarpedcraft.exampleplugin.listeners.JoinListener;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ExamplePlugin extends JavaPlugin {
 
     private ProfileManager profileManager;
-    private DomainManager domainManager; // Added tracker reference slot
+    private DomainManager domainManager;
 
     @Override
     public void onEnable() {
         this.profileManager = new ProfileManager(this);
-        this.domainManager = new DomainManager(); // Instantiated tracker
-        
-        saveDefaultConfig();
+        this.domainManager = new DomainManager();
 
-        if (getCommand("jjk") != null) {
-            TechniqueCommands handler = new TechniqueCommands(this);
-            getCommand("jjk").setExecutor(handler);
-            getCommand("jjk").setTabCompleter(handler);
-        }
+        getCommand("jjk").setExecutor(new TechniqueCommands(this));
+        getCommand("jjk").setTabCompleter(new TechniqueCommands(this));
 
-        getServer().getPluginManager().registerEvents(new CombatListener(this), this);
-        getServer().getPluginManager().registerEvents(new JoinListener(this), this);
-        
-        getLogger().info("JJK Plugin Core fully initialized with Domain Clash tracking!");
+        Bukkit.getPluginManager().registerEvents(new JoinListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new CombatListener(this), this);
+
+        getLogger().info("Jujutsu Kills enabled. All systems (ISOH, CE, Domain, Mahoraga) initialized.");
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("JJK Plugin Core safely suspended.");
+        if (profileManager != null) profileManager.saveAll();
+        if (domainManager != null) domainManager.clearAll();
     }
 
-    public ProfileManager getProfileManager() {
-        return profileManager;
-    }
-
-    public DomainManager getDomainManager() {
-        return domainManager;
-    }
+    public ProfileManager getProfileManager() { return profileManager; }
+    public DomainManager getDomainManager() { return domainManager; }
 }
