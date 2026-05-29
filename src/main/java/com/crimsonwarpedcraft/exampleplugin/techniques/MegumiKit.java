@@ -1,53 +1,35 @@
 package com.crimsonwarpedcraft.exampleplugin.techniques;
 
+import com.crimsonwarpedcraft.exampleplugin.ExamplePlugin;
 import com.crimsonwarpedcraft.exampleplugin.data.PlayerProfile;
-import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Wolf;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class MegumiKit {
-    public static void castDivineDog(Player player, PlayerProfile profile, FileConfiguration config) {
-        int ceCost = config.getInt("techniques.megumi.dog-ce-cost", 20);
+    public static void execute(Player p, PlayerProfile prof, int slot) {
+        ExamplePlugin plugin = JavaPlugin.getPlugin(ExamplePlugin.class);
 
-        if (profile.getCursedEnergy() < ceCost) {
-            player.sendMessage("§cNot enough Cursed Energy!");
-            return;
+        if (slot == 1) { // Divine Dogs
+            p.sendMessage("§8Divine Dogs, come!");
+            p.getWorld().spawnEntity(p.getLocation(), EntityType.WOLF);
+            prof.setCooldown("ability1", 20);
+        } else if (slot == 2) { // MAHORAGA SUMMON
+            p.sendMessage("§8§lWith this treasure, I summon...");
+            p.sendMessage("§0§lMAHORAGA");
+            
+            // Buffs for the "Summoner"
+            p.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, 600, 2));
+            p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 600, 1));
+            p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 600, 3));
+            
+            p.getWorld().strikeLightningEffect(p.getLocation());
+            p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 0.5f);
+            
+            prof.setCooldown("ability2", 120);
         }
-        profile.setCursedEnergy(profile.getCursedEnergy() - ceCost);
-        player.sendMessage("§8§lDivine Dog: Totality!");
-
-        Location spawnLoc = player.getLocation().add(player.getLocation().getDirection().multiply(1.5));
-        spawnLoc.getWorld().spawnParticle(Particle.TRIAL_SPAWNER_DETECTION, spawnLoc, 20, 0.3, 0.3, 0.3);
-        spawnLoc.getWorld().playSound(spawnLoc, Sound.ENTITY_WOLF_GROWL, 1.0F, 0.8F);
-
-        Wolf wolf = (Wolf) player.getWorld().spawnEntity(spawnLoc, EntityType.WOLF);
-        wolf.setTamed(true);
-        wolf.setOwner(player);
-        wolf.setCustomName("§8§lDivine Dog Totality");
-        wolf.setCustomNameVisible(true);
-    }
-
-    public static void castMahoraga(Player player, PlayerProfile profile, FileConfiguration config) {
-        int ceCost = config.getInt("techniques.megumi.mahoraga-ce-cost", 150);
-
-        if (profile.getCursedEnergy() < ceCost) {
-            player.sendMessage("§cNot enough Cursed Energy!");
-            return;
-        }
-        profile.setCursedEnergy(profile.getCursedEnergy() - ceCost);
-        player.sendMessage("§5§lWith this treasure, I summon...");
-
-        Location spawnLoc = player.getLocation();
-        spawnLoc.getWorld().spawnParticle(Particle.EXPLOSION_EMITTER, spawnLoc, 5, 1.0, 1.0, 1.0);
-        spawnLoc.getWorld().playSound(spawnLoc, Sound.ENTITY_WITHER_SPAWN, 1.0F, 0.5F);
-
-        IronGolem mahoraga = (IronGolem) player.getWorld().spawnEntity(spawnLoc, EntityType.IRON_GOLEM);
-        mahoraga.setCustomName("§5§lDivine General Mahoraga");
-        mahoraga.setCustomNameVisible(true);
     }
 }
