@@ -34,11 +34,10 @@ public class PlayerProfile {
         player.removePotionEffect(PotionEffectType.SPEED);
         player.removePotionEffect(PotionEffectType.RESISTANCE);
 
-        // Mahoraga Specific Stats
         if (this.jujutsuGrade.equalsIgnoreCase("Mahoraga")) {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, -1, 1, false, false));    // Str 2
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, -1, 3, false, false));       // Speed 4
-            player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, -1, 0, false, false));  // Res 1
+            player.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, -1, 1, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, -1, 3, false, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, -1, 0, false, false));
             return;
         }
 
@@ -64,7 +63,7 @@ public class PlayerProfile {
 
     public void reduceAllCooldowns(int seconds) {
         long reductionMillis = seconds * 1000L;
-        for (String key : cooldowns.keySet()) {
+        for (String key : new HashMap<>(cooldowns).keySet()) {
             cooldowns.put(key, cooldowns.get(key) - reductionMillis);
         }
     }
