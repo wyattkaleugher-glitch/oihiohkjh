@@ -1,31 +1,40 @@
 package com.crimsonwarpedcraft.exampleplugin.techniques;
 
+import com.crimsonwarpedcraft.exampleplugin.ExamplePlugin;
 import com.crimsonwarpedcraft.exampleplugin.data.PlayerProfile;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
-public class AbilityEngine {
+public class DomainEngine {
+    public static void launchDomain(Player p, PlayerProfile prof) {
+        ExamplePlugin plugin = (ExamplePlugin) JavaPlugin.getPlugin(ExamplePlugin.class);
+        Location center = p.getLocation();
+        Material shell = Material.TINTED_GLASS;
 
-    public static void useAbility(Player p, PlayerProfile prof, int slot) {
-        if (prof.getTechnique() == null) return;
-        
-        String moveKey = "ability" + slot;
-        if (prof.getCooldown(moveKey) > 0) {
-            p.sendMessage("§cCooldown: " + prof.getCooldown(moveKey) + "s");
-            return;
+        // MATCHING THE THEMES
+        switch (prof.getTechnique()) {
+            case GOJO -> shell = Material.BLACK_STAINED_GLASS;
+            case SUKUNA -> shell = Material.RED_STAINED_GLASS;
+            case MAHITO -> shell = Material.WHITE_STAINED_GLASS;
+            case MEGUMI -> shell = Material.GRAY_STAINED_GLASS;
+            case YUJI -> shell = Material.YELLOW_STAINED_GLASS;
+            case INUMAKI -> shell = Material.LIGHT_GRAY_STAINED_GLASS;
+            default -> shell = Material.GLASS;
         }
 
-        // Points directly to your existing files from the screenshot
-        switch (prof.getTechnique()) {
-            case GOJO -> GojoKit.execute(p, prof, slot);
-            case SUKUNA -> SukunaKit.execute(p, prof, slot);
-            case MAHITO -> MahitoKit.execute(p, prof, slot);
-            case MEGUMI -> MegumiKit.execute(p, prof, slot);
-            case YUJI -> YujiKit.execute(p, prof, slot);
-            case INUMAKI -> InumakiKit.execute(p, prof, slot);
-            case MAHORAGA -> {
-                // If you have a MahoragaKit.java, call it here. 
-                // Otherwise, it uses the base buffs from the profile.
+        int r = 8;
+        for (int x = -r; x <= r; x++) {
+            for (int y = -r; y <= r; y++) {
+                for (int z = -r; z <= r; z++) {
+                    if (Math.abs(Math.sqrt(x*x + y*y + z*z) - r) < 0.5) {
+                        center.clone().add(x, y, z).getBlock().setType(shell);
+                    }
+                }
             }
         }
+        
+        p.sendMessage("§d§lDOMAIN EXPANSION!");
+        plugin.getDomainManager().registerDomain(p.getUniqueId(), center);
     }
 }
